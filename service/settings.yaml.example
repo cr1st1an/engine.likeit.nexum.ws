@@ -1,0 +1,9 @@
+database:
+  mongo:
+    host: localhost
+    name: dev_likeit
+  mysql:
+    host: localhost
+    user: dev_likeit_user
+    name: dev_likeit_data
+    password: xxx
