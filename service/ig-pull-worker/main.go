@@ -37,7 +37,7 @@ type myMedia struct {
 */
 func init() {
 	// Attempt to open settings file.
-	yf, err := yaml.Open("settings.yaml")
+	yf, err := yaml.Open("../settings.yaml")
 
 	if err != nil {
 		panic(err.Error())
