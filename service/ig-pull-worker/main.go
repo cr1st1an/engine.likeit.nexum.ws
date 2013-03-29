@@ -13,7 +13,12 @@ import (
 	"github.com/gosexy/yaml"
 	"github.com/xiam/instagram"
 	"log"
+	"time"
 )
+
+const queryLimit = 200
+
+const sleepTime = time.Second*60
 
 // MySQL client
 var myc db.Database
@@ -104,6 +109,7 @@ func pullPhoto(mediaId string) error {
 		}
 
 		data := res["data"].(map[string]interface{})
+		data["imported"] = false
 
 		// Append photo to database.
 		_, err = photos.Append(data)
@@ -132,11 +138,21 @@ func updateMedia() error {
 	// A simple query.
 	res, err := view.Query(
 		db.Sort{"c": -1},
+		//db.Limit(queryLimit),
 	)
 
 	if err != nil {
 		return err
 	}
+
+	/*
+	count, _ := view.Count(
+		db.Sort{"c": -1},
+		db.Limit(queryLimit),
+	)
+
+	log.Printf("Got %d new items.\n", count)
+	*/
 
 	var media myMedia
 
@@ -154,7 +170,7 @@ func updateMedia() error {
 
 		if err != nil {
 			// Log to stderr.
-			log.Printf("err: %v\n", err)
+			log.Printf("Error while pulling photo id %v: %v\n", media.IdIgMedia, err)
 		}
 
 	}
@@ -163,5 +179,9 @@ func updateMedia() error {
 }
 
 func main() {
-	updateMedia()
+	for true {
+		log.Printf("Updating...\n")
+		updateMedia()
+		time.Sleep(sleepTime)
+	}
 }
