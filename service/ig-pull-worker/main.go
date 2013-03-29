@@ -18,7 +18,7 @@ import (
 
 const queryLimit = 200
 
-const sleepTime = time.Second*60
+const sleepTime = time.Second*300
 
 // MySQL client
 var myc db.Database
