@@ -103,7 +103,7 @@ func (self *Featured) List() (map[string]interface{}, error) {
 func main() {
 
 	server := bridge.New(serverType, serverAddr)
-	server.AddRoute("/api/featured", &Featured{})
+	server.AddRoute("/api/v1/featured", &Featured{})
 	err := server.Start()
 
 	if err != nil {
