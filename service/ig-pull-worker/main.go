@@ -18,7 +18,7 @@ import (
 
 const queryLimit = 200
 
-const sleepTime = time.Second*300
+const sleepTime = time.Second * 300
 
 // MySQL client
 var myc db.Database
@@ -146,12 +146,12 @@ func updateMedia() error {
 	}
 
 	/*
-	count, _ := view.Count(
-		db.Sort{"c": -1},
-		db.Limit(queryLimit),
-	)
+		count, _ := view.Count(
+			db.Sort{"c": -1},
+			db.Limit(queryLimit),
+		)
 
-	log.Printf("Got %d new items.\n", count)
+		log.Printf("Got %d new items.\n", count)
 	*/
 
 	var media myMedia
