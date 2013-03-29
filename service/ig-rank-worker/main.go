@@ -26,7 +26,7 @@ const InstagramLikeFactor = 1.0
 // How much a LikeIt like is worth
 const LikeitLikeFactor = 100.0
 
-// How much the age difference worths
+// How much the age difference matters
 const InstagramAgeFactor = -0.001
 
 // Update time
