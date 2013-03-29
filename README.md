@@ -4,7 +4,7 @@ Internal tools for analyzing LikeIt data.
 
 ## Authors
 
-* José Carlos Nieto <jose.carlos@menteslibres.org>
+* José Carlos Nieto <<jose.carlos@menteslibres.org>>
 
 ## Bots
 
