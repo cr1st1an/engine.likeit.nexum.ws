@@ -59,10 +59,34 @@ func init() {
 	photos, _ = mgc.Collection("photos")
 }
 
+type Photo struct {
+	Id             string
+	HandpickedRank int64
+}
+
+func (self *Photo) SetHandpickedRank() (map[string]interface{}, error) {
+	err := photos.Update(
+		db.Cond{"id": self.Id},
+		db.Set{
+			"handpicked_rank": self.HandpickedRank,
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	data := map[string]interface{}{
+		"success": true,
+	}
+
+	return data, nil
+}
+
 // Listing endpoints
 type Photos struct {
 	Limit int
-	Page int
+	Page  int
 }
 
 func (self *Photos) List() (map[string]interface{}, error) {
@@ -78,7 +102,7 @@ func (self *Photos) List() (map[string]interface{}, error) {
 	items, err := photos.FindAll(
 		db.Sort{"created_time": -1},
 		db.Limit(self.Limit),
-		db.Offset(self.Page * self.Limit),
+		db.Offset(self.Page*self.Limit),
 	)
 
 	if err != nil {
@@ -86,7 +110,8 @@ func (self *Photos) List() (map[string]interface{}, error) {
 	}
 
 	data := map[string]interface{}{
-		"data": items,
+		"success": true,
+		"data":    items,
 	}
 
 	return data, nil
@@ -127,7 +152,8 @@ func (self *Featured) List() (map[string]interface{}, error) {
 	}
 
 	data := map[string]interface{}{
-		"data": response,
+		"success": true,
+		"data":    response,
 	}
 
 	return data, nil
