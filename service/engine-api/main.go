@@ -163,6 +163,8 @@ func main() {
 
 	server := bridge.New(serverType, serverAddr)
 	server.AddRoute("/api/v1/featured", &Featured{})
+	server.AddRoute("/api/v1/photo", &Photo{})
+	server.AddRoute("/api/v1/photos", &Photos{})
 	err := server.Start()
 
 	if err != nil {
