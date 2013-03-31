@@ -18,16 +18,19 @@ import (
 // Constants for the dummy ranker
 
 // How much an Instagram comment is worth
-const InstagramCommentFactor = 2.0
+const InstagramCommentFactor = 0.0 // 2.0
 
 // How much an Instagram like is worth
-const InstagramLikeFactor = 1.0
+const InstagramLikeFactor = 0.0 // 1.0
 
 // How much a LikeIt like is worth
-const LikeitLikeFactor = 100.0
+const LikeitLikeFactor = 0.0 // 100.0
 
 // How much the age difference matters
-const InstagramAgeFactor = -0.001
+const InstagramAgeFactor = 0.0 // -0.001
+
+// How much the handpicked rank is worth
+const LikeitHandpickedRankFactor = 1.0
 
 // Update time
 const sleepTime = time.Second * 300
@@ -121,6 +124,7 @@ func getRank(photo map[string]interface{}) int64 {
 	rank += dig.Float64(&photo, "ig_likes_count") * InstagramLikeFactor
 	rank += dig.Float64(&photo, "ig_comments_count") * InstagramCommentFactor
 	rank += dig.Float64(&photo, "likeit_count") * LikeitLikeFactor
+	rank += dig.Float64(&photo, "handpicked_rank") * LikeitHandpickedRankFactor
 	rank += float64(age) * InstagramAgeFactor
 
 	return int64(rank)
@@ -133,7 +137,7 @@ func addNewPhotos() error {
 	var err error
 
 	// Querying photos that have not been imported yet.
-	res, err := photos.Query(db.Cond{"imported": false})
+	res, err := photos.Query()
 
 	for {
 
@@ -144,30 +148,42 @@ func addNewPhotos() error {
 			break
 		}
 
+		// Get likes
+		likeData, _ := likes.Find(
+			db.Cond{"id_ig_media": photo["id"]},
+		)
+
 		exists, _ := featured.Count(db.Cond{"id": photo["id"]})
 
 		if exists == 0 {
-			// Get likes
-			likeData, _ := likes.Find(
-				db.Cond{"id_ig_media": photo["id"]},
-			)
 
 			_, err = featured.Append(db.Item{
 				"id":                photo["id"],
-				"rank":              0, // Have to talk to Cris
-				"hand_picked":       0, // Have to talk to Cris
+				"rank":              0,                                    // Have to talk to Cris
+				"handpicked_rank":   dig.Int64(&photo, "handpicked_rank"), // Have to talk to Cris
 				"likeit_count":      dig.Int64(&likeData, "c"),
 				"ig_likes_count":    dig.Int64(&photo, "likes", "count"),
 				"ig_comments_count": dig.Int64(&photo, "comments", "count"),
 				"created_time":      dig.Int64(&photo, "created_time"),
 				"modified":          time.Now().Unix(),
 			})
-		}
 
-		if err == nil {
-			photos.Update(
+			if err == nil {
+				photos.Update(
+					db.Cond{"id": photo["id"]},
+					db.Set{"imported": true},
+				)
+			}
+		} else {
+			featured.Update(
 				db.Cond{"id": photo["id"]},
-				db.Set{"imported": true},
+				db.Set{
+					"handpicked_rank":   dig.Int64(&photo, "handpicked_rank"),
+					"likeit_count":      dig.Int64(&likeData, "c"),
+					"ig_likes_count":    dig.Int64(&photo, "likes", "count"),
+					"ig_comments_count": dig.Int64(&photo, "comments", "count"),
+					"modified":          time.Now().Unix(),
+				},
 			)
 		}
 

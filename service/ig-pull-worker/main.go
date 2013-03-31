@@ -110,6 +110,7 @@ func pullPhoto(mediaId string) error {
 
 		data := res["data"].(map[string]interface{})
 		data["imported"] = false
+		data["handpicked_rank"] = 0
 
 		// Append photo to database.
 		_, err = photos.Append(data)
