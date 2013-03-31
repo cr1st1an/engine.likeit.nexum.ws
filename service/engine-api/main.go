@@ -59,6 +59,39 @@ func init() {
 	photos, _ = mgc.Collection("photos")
 }
 
+// Listing endpoints
+type Photos struct {
+	Limit int
+	Page int
+}
+
+func (self *Photos) List() (map[string]interface{}, error) {
+	if self.Page < 1 {
+		self.Page = 1
+	}
+
+	if self.Limit < 1 {
+		self.Limit = 100
+	}
+
+	// Sort
+	items, err := photos.FindAll(
+		db.Sort{"created_time": -1},
+		db.Limit(self.Limit),
+		db.Offset(self.Page * self.Limit),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	data := map[string]interface{}{
+		"data": items,
+	}
+
+	return data, nil
+}
+
 // Featured photos
 type Featured struct {
 	Limit int
